@@ -34,20 +34,17 @@ def main():
         if content.isnumeric():
             since_id = int(content)
     while True:
-        new_since_id = 0
         for tweet in tweepy.Cursor(api.mentions_timeline, since_id=since_id).items():
-            new_since_id = max(tweet.id, since_id)
-            # print(new_since_id)
+            since_id = max(tweet.id, since_id)
             palette_maker.make_palette(tweet, api)
         
-        if new_since_id:
-            with open('data/since_id.txt', 'w') as f:
-                f.write(str(new_since_id))
-            since_id = new_since_id
+        with open('data/since_id.txt', 'w') as f:
+            f.write(str(since_id))
         now = datetime.datetime.now()
         if now.minute % 60 == 0:
             logger.info("Waiting...")
         time.sleep(60)
 
 if __name__ == "__main__":
+    os.makedirs('data', exist_ok=True)
     main()
