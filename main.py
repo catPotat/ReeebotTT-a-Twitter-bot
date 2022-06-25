@@ -1,4 +1,5 @@
 import tweepy
+import boto3
 import logging
 from dotenv import load_dotenv
 load_dotenv()
@@ -13,9 +14,18 @@ logger = logging.getLogger()
 
 API_KEY = os.getenv('TWITTER_BOT_KEY')
 API_SECRET_KEY = os.getenv('TWITTER_BOT_SECRET_KEY')
-
 ACCESS_TOKEN = os.getenv('rbgtx_ACCESS_TOKEN')
 ACCESS_TOKEN_SECRET = os.getenv('rbgtx_ACCESS_TOKEN_SECRET')
+
+dynamodb = boto3.resource('dynamodb',
+    aws_access_key_id = os.getenv('AWS_KEY_ID'),
+    aws_secret_access_key = os.getenv('AWS_SECRET_KEY'),
+    region_name = os.getenv('AWS_REGION'),
+)
+table = dynamodb.Table(os.getenv('REEEBOT_DATA_TABLE'))
+
+print(table.creation_date_time)
+
 
 
 def main():
@@ -41,10 +51,11 @@ def main():
         with open('data/since_id.txt', 'w') as f:
             f.write(str(since_id))
         now = datetime.datetime.now()
-        if now.minute % 60 == 0:
+        if now.hour == 0:
             logger.info("Waiting...")
         time.sleep(60)
 
+
 if __name__ == "__main__":
     os.makedirs('data', exist_ok=True)
-    main()
+    # main()

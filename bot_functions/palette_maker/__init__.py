@@ -16,7 +16,7 @@ def make_palette(tweet, api):
     for word in word_list:
         if word.startswith('mode='):
             mode = word.split('=', 1)[1]
-            if mode not in ('colorful', 'averaged'):
+            if mode not in ('colorful', 'averaged', 'kmeans'):
                 mode = 'colorful'
 
         if word.startswith('numcolors='):
@@ -36,22 +36,22 @@ def make_palette(tweet, api):
         img.open_from_url(img_url)
         if mode == 'colorful':
             img.nearest_color_quantize(limit=n_colors)
-        elif mode == 'averaged':
+        elif mode in ('averaged', 'kmeans'):
             img.kmeans_quantize(n_clusters=n_colors)
         file_path = img.export_png()
 
-        media = api.media_upload(file_path)
-        api.update_status(
-            status=f"@{tweet.user.screen_name} Extracted color palette:",
-            media_ids=[media.media_id],
-            in_reply_to_status_id=tweet.id,
-        )
+        # media = api.media_upload(file_path)
+        # api.update_status(
+        #     status=f"@{tweet.user.screen_name} Extracted color palette:",
+        #     media_ids=[media.media_id],
+        #     in_reply_to_status_id=tweet.id,
+        # )
     except Exception as e:
         print(e)
-        api.update_status(
-            status=f"@{tweet.user.screen_name} No image was found",
-            in_reply_to_status_id=tweet.id,
-        )
+        # api.update_status(
+        #     status=f"@{tweet.user.screen_name} No image was found",
+        #     in_reply_to_status_id=tweet.id,
+        # )
 
     if not tweet.user.following:
         tweet.user.follow()
